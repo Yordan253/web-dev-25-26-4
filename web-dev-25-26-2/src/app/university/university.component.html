@@ -60,6 +60,9 @@
 
   .nav-link {
     margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
 </style>
 
@@ -68,6 +71,9 @@
     <div class="nav-link">
       <a routerLink="/" style="color: var(--p-primary-color); text-decoration: none;">
         ← Back to Students
+      </a>
+      <a routerLink="/subjects" style="color: var(--p-primary-color); text-decoration: none;">
+        Manage Subjects →
       </a>
     </div>
 
@@ -107,13 +113,13 @@
       </div>
 
       <div class="submit-button w-full" style="display: flex; gap: 0.5rem;">
-        <p-button 
-          type="submit" 
-          [label]="editingUniversity ? 'Update University' : 'Add University'" 
+        <p-button
+          type="submit"
+          [label]="editingUniversity ? 'Update University' : 'Add University'"
           [loading]="loading"
           [disabled]="loading"
         ></p-button>
-        <p-button 
+        <p-button
           *ngIf="editingUniversity"
           type="button"
           label="Cancel"
@@ -126,8 +132,8 @@
     </form>
 
     <div class="table-container">
-      <p-table 
-        [value]="universities" 
+      <p-table
+        [value]="universities"
         [tableStyle]="{ 'min-width': '100%' }"
         [loading]="loading"
       >
@@ -151,7 +157,7 @@
                   [outlined]="true"
                   (click)="editUniversity(university)"
                   [disabled]="loading"
-                />
+                ></p-button>
                 <p-button
                   icon="pi pi-trash"
                   severity="danger"
@@ -159,7 +165,7 @@
                   [outlined]="true"
                   (click)="deleteUniversity(university)"
                   [disabled]="loading"
-                />
+                ></p-button>
               </div>
             </td>
           </tr>
@@ -175,4 +181,3 @@
     </div>
   </div>
 </main>
-

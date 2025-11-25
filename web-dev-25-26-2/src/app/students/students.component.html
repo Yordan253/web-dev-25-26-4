@@ -58,13 +58,23 @@
     margin-top: 2rem;
     width: 100%;
   }
+
+  .nav-link {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
 </style>
 
 <main class="main">
   <div class="content">
-    <div style="margin-bottom: 1rem;">
+    <div class="nav-link">
       <a routerLink="/university" style="color: var(--p-primary-color); text-decoration: none;">
-        → Manage Universities
+        Manage Universities →
+      </a>
+      <a routerLink="/subjects" style="color: var(--p-primary-color); text-decoration: none;">
+        Manage Subjects →
       </a>
     </div>
 
@@ -143,13 +153,13 @@
       </div>
 
       <div class="submit-button w-full" style="display: flex; gap: 0.5rem;">
-        <p-button 
-          type="submit" 
-          [label]="editingStudent ? 'Update Student' : 'Add Student'" 
+        <p-button
+          type="submit"
+          [label]="editingStudent ? 'Update Student' : 'Add Student'"
           [loading]="loading"
           [disabled]="loading"
         ></p-button>
-        <p-button 
+        <p-button
           *ngIf="editingStudent"
           type="button"
           label="Cancel"
@@ -162,8 +172,8 @@
     </form>
 
     <div class="table-container">
-      <p-table 
-        [value]="students" 
+      <p-table
+        [value]="students"
         [tableStyle]="{ 'min-width': '100%' }"
         [loading]="loading"
       >
@@ -193,7 +203,7 @@
                   [outlined]="true"
                   (click)="editStudent(student)"
                   [disabled]="loading"
-                />
+                ></p-button>
                 <p-button
                   icon="pi pi-trash"
                   severity="danger"
@@ -201,7 +211,7 @@
                   [outlined]="true"
                   (click)="deleteStudent(student)"
                   [disabled]="loading"
-                />
+                ></p-button>
               </div>
             </td>
           </tr>
@@ -217,4 +227,3 @@
     </div>
   </div>
 </main>
-

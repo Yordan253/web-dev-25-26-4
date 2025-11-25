@@ -187,4 +187,3 @@ export class StudentsComponent implements OnInit {
     return student.university?.name || 'N/A';
   }
 }
-
