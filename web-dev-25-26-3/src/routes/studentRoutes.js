@@ -1,14 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const AppDataSource = require("../config/database");
+const { In } = require("typeorm");
 
 router.post("/", async (req, res) => {
   try {
-    const { facultyNumber, firstName, middleName, lastName, universityId } = req.body;
+    const {
+      facultyNumber,
+      firstName,
+      middleName,
+      lastName,
+      universityId,
+      subjectIds,              // <-- НОВО
+    } = req.body;
 
     if (!facultyNumber || !firstName || !lastName || !universityId) {
       return res.status(400).json({
-        error: "Faculty number, first name, last name, and university ID are required",
+        error:
+          "Faculty number, first name, last name, and university ID are required",
       });
     }
 
@@ -22,25 +31,36 @@ router.post("/", async (req, res) => {
     }
 
     const studentRepo = AppDataSource.getRepository("Student");
+    const subjectRepo = AppDataSource.getRepository("Subject");
+
+    let subjects = [];
+    if (Array.isArray(subjectIds) && subjectIds.length > 0) {
+      const ids = subjectIds.map((id) => parseInt(id));
+      subjects = await subjectRepo.findBy({ id: In(ids) });
+    }
+
     const student = studentRepo.create({
       facultyNumber,
       firstName,
       middleName,
       lastName,
       university,
+      subjects, // <-- many-to-many
     });
 
     const savedStudent = await studentRepo.save(student);
     const result = await studentRepo.findOne({
       where: { id: savedStudent.id },
-      relations: ["university"],
+      relations: ["university", "subjects"], // <-- добавихме subjects
     });
 
     res.status(201).json(result);
   } catch (error) {
+    console.error("Error creating student:", error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get("/", async (req, res) => {
   try {
@@ -58,10 +78,10 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const studentRepo = AppDataSource.getRepository("Student");
-    const student = await studentRepo.findOne({
-      where: { id: parseInt(req.params.id) },
-      relations: ["university"],
+    const students = await studentRepo.find({
+      relations: ["university", "subjects"],
     });
+    
 
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
@@ -75,12 +95,21 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const { facultyNumber, firstName, middleName, lastName, universityId } = req.body;
+    const {
+      facultyNumber,
+      firstName,
+      middleName,
+      lastName,
+      universityId,
+      subjectIds,              // <-- НОВО
+    } = req.body;
     const studentRepo = AppDataSource.getRepository("Student");
 
     const student = await studentRepo.findOne({
       where: { id: parseInt(req.params.id) },
+      relations: ["university", "subjects"],
     });
+    
 
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
@@ -104,17 +133,30 @@ router.put("/:id", async (req, res) => {
       student.university = university;
     }
 
+    // НОВО: сменяме предметите, ако subjectIds е подадено
+    if (Array.isArray(subjectIds)) {
+      const subjectRepo = AppDataSource.getRepository("Subject");
+      if (subjectIds.length === 0) {
+        student.subjects = [];
+      } else {
+        const ids = subjectIds.map((id) => parseInt(id));
+        student.subjects = await subjectRepo.findBy({ id: In(ids) });
+      }
+    }
+
     const updatedStudent = await studentRepo.save(student);
     const result = await studentRepo.findOne({
       where: { id: updatedStudent.id },
-      relations: ["university"],
+      relations: ["university", "subjects"],
     });
 
     res.json(result);
   } catch (error) {
+    console.error("Error updating student:", error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 router.delete("/:id", async (req, res) => {
   try {

@@ -16,6 +16,7 @@ export interface Student {
     name: string;
     location: string;
   };
+  subjects?: Subject[];
 }
 
 export interface University {

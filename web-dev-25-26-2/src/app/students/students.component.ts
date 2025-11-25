@@ -7,6 +7,7 @@ import { MessageModule } from 'primeng/message';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { ApiService, Student, University } from '../services/api.service';
 
 @Component({
@@ -21,6 +22,7 @@ import { ApiService, Student, University } from '../services/api.service';
     ReactiveFormsModule,
     TableModule,
     SelectModule,
+    MultiSelectModule
   ],
   templateUrl: './students.component.html',
   styleUrl: './students.component.scss',
@@ -29,6 +31,7 @@ export class StudentsComponent implements OnInit {
   registrationForm: FormGroup;
   students: Student[] = [];
   universities: Array<{ label: string; value: number }> = [];
+  subjects: Array<{ label: string; value: number }> = [];
   loading = false;
   error: string | null = null;
   editingStudent: Student | null = null;
@@ -42,14 +45,33 @@ export class StudentsComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       middleName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      universityId: ['', [Validators.required]]
+      universityId: ['', [Validators.required]],
+      subjectIds: [[]], 
     });
   }
 
   ngOnInit() {
     this.loadStudents();
     this.loadUniversities();
+    this.loadSubjects();  
   }
+
+  loadSubjects() {
+    this.apiService.getSubjects().subscribe({
+      next: (subjects) => {
+        this.subjects = subjects.map((s) => ({
+          label: `${s.name} (${s.code})`,
+          value: s.id as number,
+        }));
+      },
+      error: (err) => {
+        this.error =
+          'Failed to load subjects: ' + (err.error?.error || err.message);
+        console.error('Error loading subjects:', err);
+      },
+    });
+  }
+  
 
   loadStudents() {
     this.loading = true;
@@ -87,13 +109,21 @@ export class StudentsComponent implements OnInit {
       this.loading = true;
       this.error = null;
       const formValue = this.registrationForm.value;
-      const studentData = {
-        facultyNumber: formValue.facultyNumber,
-        firstName: formValue.firstName,
-        middleName: formValue.middleName || undefined,
-        lastName: formValue.lastName,
-        universityId: formValue.universityId
-      };
+const studentData: any = {
+  facultyNumber: formValue.facultyNumber,
+  firstName: formValue.firstName,
+  middleName: formValue.middleName || undefined,
+  lastName: formValue.lastName,
+  universityId: formValue.universityId,
+};
+
+// ако има избрани предмети – пращаме ги
+if (Array.isArray(formValue.subjectIds) && formValue.subjectIds.length > 0) {
+  studentData.subjectIds = formValue.subjectIds;
+} else {
+  studentData.subjectIds = []; // за да може при update да се изчистят
+}
+
 
       if (this.editingStudent?.id) {
         // Update existing student
@@ -139,8 +169,10 @@ export class StudentsComponent implements OnInit {
       firstName: student.firstName,
       middleName: student.middleName || '',
       lastName: student.lastName,
-      universityId: student.universityId || student.university?.id
+      universityId: student.universityId || student.university?.id,
+      subjectIds: (student.subjects || []).map((s) => s.id) // <-- НОВО
     });
+    
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

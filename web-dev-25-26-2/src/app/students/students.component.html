@@ -40,6 +40,7 @@
   }
 
   .form-field input,
+  .form-field p-multiSelect,
   .form-field p-select {
     width: 100%;
   }
@@ -69,11 +70,18 @@
 
 <main class="main">
   <div class="content">
+    <!-- Navigation links -->
     <div class="nav-link">
-      <a routerLink="/university" style="color: var(--p-primary-color); text-decoration: none;">
+      <a
+        routerLink="/university"
+        style="color: var(--p-primary-color); text-decoration: none;"
+      >
         Manage Universities →
       </a>
-      <a routerLink="/subjects" style="color: var(--p-primary-color); text-decoration: none;">
+      <a
+        routerLink="/subjects"
+        style="color: var(--p-primary-color); text-decoration: none;"
+      >
         Manage Subjects →
       </a>
     </div>
@@ -95,7 +103,7 @@
           placeholder="Enter faculty number"
         />
         <span class="error-text" *ngIf="getFieldError('facultyNumber')">
-          {{ getFieldError("facultyNumber") }}
+          {{ getFieldError('facultyNumber') }}
         </span>
       </div>
 
@@ -109,7 +117,7 @@
           placeholder="Enter your first name"
         />
         <span class="error-text" *ngIf="getFieldError('firstName')">
-          {{ getFieldError("firstName") }}
+          {{ getFieldError('firstName') }}
         </span>
       </div>
 
@@ -134,7 +142,7 @@
           placeholder="Enter your last name"
         />
         <span class="error-text" *ngIf="getFieldError('lastName')">
-          {{ getFieldError("lastName") }}
+          {{ getFieldError('lastName') }}
         </span>
       </div>
 
@@ -148,8 +156,20 @@
           [style]="{ width: '100%' }"
         ></p-select>
         <span class="error-text" *ngIf="getFieldError('universityId')">
-          {{ getFieldError("universityId") }}
+          {{ getFieldError('universityId') }}
         </span>
+      </div>
+
+      <!-- NEW: Subjects multi-select -->
+      <div class="form-field">
+        <label for="subjectIds">Subjects</label>
+        <p-multiSelect
+          id="subjectIds"
+          [options]="subjects"
+          formControlName="subjectIds"
+          placeholder="Select subjects"
+          [style]="{ width: '100%' }"
+        ></p-multiSelect>
       </div>
 
       <div class="submit-button w-full" style="display: flex; gap: 0.5rem;">
