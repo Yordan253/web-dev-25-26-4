@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api/universities", universityRoutes);
 app.use("/api/students", studentRoutes);
-app.use("/api/subjects", subjectRoutes); 
+app.use("/api/subjects", subjectRoutes);
 
 app.get("/", (req, res) => {
   res.json({
